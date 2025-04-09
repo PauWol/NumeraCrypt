@@ -82,6 +82,17 @@ class Key:
         decoded = ASCII(rest).ascii
         return decoded, int(prefix)
 
+    def validate(self):
+        if not self.value:
+            return False
+        _prefix = self.extract_number_and_slash(self.value)
+        if _prefix is None or int(_prefix) <= 0:
+            return False
+        rest = self.value[len(_prefix) + 1:]
+        if len(ASCII(rest).string) < self.max_length:
+            return False
+        return True
+
 
 if __name__ == "__main__":
     # Generate a new key using an empty salt (or provide your custom salt here)
