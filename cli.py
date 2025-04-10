@@ -121,13 +121,14 @@ def key(
         key = key_generator.generate()
         typer.echo(f"🔑 Generated key: {key}")
     else:
-        typer.echo("❗ Please provide either a key or a salt to generate a key.")
-        raise typer.Exit(1)
+       key_generator = Key("", rounds, length)
+       key = key_generator.generate()
+       typer.echo(f"🔑 Generated key: {key}")
 
     if key_safe:
-        key_path = Path("key.key")
-        key_path.write_text(key)
-        typer.echo(f"📄  Key saved to {key_path}")
+        key_generator.safe()
+        env_path = os.getenv("KEY_STORAGE_DIRECTORY")
+        typer.echo(f"📄  Key saved to { os.path.expandvars(env_path)}")
 
 if __name__ == "__main__":
     app()
