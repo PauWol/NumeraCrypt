@@ -7,10 +7,10 @@ setup(
     install_requires=["base91", "typer"],
     entry_points={
         "console_scripts": [
-            "numcrypt=numcrypt.cli:main"
+            "numeracrypt=numeracrypt.cli:app"
         ]
     },
-    author="Your Name",
+    author="PauWol",
     description="NumeraCrypt CLI Tool",
     classifiers=[
         "Programming Language :: Python :: 3",

@@ -1,5 +1,5 @@
-from core.cipher import NumeraCrypt
-from core.key import Key
+from numeracrypt.core.cipher import NumeraCrypt
+from numeracrypt.core.key import Key
 
 text = "Hello, secure world!"
 

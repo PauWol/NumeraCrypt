@@ -1,5 +1,5 @@
-from core.convert import ASCII
-from core.file import File
+from numeracrypt.core.convert import ASCII
+from numeracrypt.core.file import File
 from dotenv import load_dotenv
 import random
 import re

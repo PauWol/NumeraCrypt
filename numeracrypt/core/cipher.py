@@ -1,6 +1,6 @@
-from core.convert import ASCII
-from core.key import Key
-from core.file import File
+from numeracrypt.core.convert import ASCII
+from numeracrypt.core.key import Key
+from numeracrypt.core.file import File
 
 class NumeraCrypt:
     def __init__(self, value: str, key: str, file: bool = False,dir: bool = False):

@@ -1,12 +1,14 @@
 import typer
-from core.cipher import NumeraCrypt
-from core.key import Key
+from numeracrypt.core.cipher import NumeraCrypt
+from numeracrypt.core.key import Key
 from pathlib import Path
 from dotenv import load_dotenv
 import os
 load_dotenv()
 
-
+def key_store_location() -> str:
+    env_path = os.getenv("KEY_STORAGE_DIRECTORY")
+    return os.path.expandvars(env_path)
 
 app = typer.Typer(help="NumeraCrypt: A custom encryption tool.")
 
@@ -21,6 +23,10 @@ def encrypt(
 ):
     """Encrypt files, directories, or strings using NumeraCrypt."""
     # Generate key if not provided
+    if not file or not dir or not content:
+        typer.echo("❗ Please specify a file, a directory, or content to encrypt.")
+        raise typer.Exit(1)
+
     if not key:
         key = Key(rounds=8, max_length=64).generate()
         typer.echo(f"🔑 Generated key: {key}")
@@ -41,14 +47,10 @@ def encrypt(
         nc = NumeraCrypt(str(content), key)
         encrypted_content = nc.encrypt()
         typer.echo(f"🔒 Encrypted content: {encrypted_content}")
-    else:
-        typer.echo("❗ Please specify a file, a directory, or content to encrypt.")
-        raise typer.Exit(1)
 
     if key_safe:
-        key_path = Path("encryption_key.txt")
-        key_path.write_text(key)
-        typer.echo(f"📄  Key saved to {key_path}")
+        Key(key).safe()
+        typer.echo(f"📄  Key saved to {key_store_location()}")
 
     if content_safe:
         encrypted_path = Path("encrypted_content.txt")
@@ -58,18 +60,30 @@ def encrypt(
 
 @app.command()
 def decrypt(
+    content: str = typer.Option(None, help="Content to decrypt."),
     file: Path = typer.Option(None, exists=True, help="Path to the file to decrypt."),
     dir: Path = typer.Option(None, exists=True, help="Path to the directory to decrypt."),
-    key: str = typer.Option(..., help="Decryption key."),
+    key: str = typer.Option(
+        None,            # Default is None so that if not provided, it prompts.
+        help="Decryption key.",
+        prompt="Please enter the decryption key:"  # This is the prompt message.
+    ),
     keysafe: bool = typer.Option(False, help="Flag to save the decryption key to a file."),
     contentsafe: bool = typer.Option(False, help="Flag to save the decrypted content to a file.")
 ):
     """Decrypt files or directories using NumeraCrypt."""
+    if not file and not dir and not content:
+        typer.echo("❗ Please specify a file, a directory, or content to decrypt.")
+        raise typer.Exit(1)
+
     if not Key(key).validate():
         typer.echo("❗ Invalid key format. Please use a valid key.")
         raise typer.Exit(1)
 
-    if file:
+    if content:
+        nc = NumeraCrypt(str(content), key)
+        typer.echo(f"🔓 Decrypted content: {nc.decrypt()}")
+    elif file:
         nc = NumeraCrypt(str(file), key, file=True)
         nc.decrypt()
         typer.echo(f"🔓 Decrypted file: {file}")
@@ -82,9 +96,8 @@ def decrypt(
         raise typer.Exit(1)
 
     if keysafe:
-        key_path = Path("decryption_key.txt")
-        key_path.write_text(key)
-        typer.echo(f"📄  Key saved to {key_path}")
+        Key(key).safe()
+        typer.echo(f"📄  Key saved to {key_store_location()}")
 
     if contentsafe:
         decrypted_path = Path("decrypted_content.txt")
@@ -127,8 +140,7 @@ def key(
 
     if key_safe:
         key_generator.safe()
-        env_path = os.getenv("KEY_STORAGE_DIRECTORY")
-        typer.echo(f"📄  Key saved to { os.path.expandvars(env_path)}")
+        typer.echo(f"📄  Key saved to { key_store_location() }")
 
 if __name__ == "__main__":
     app()
