@@ -48,6 +48,11 @@ Run this inside the project folder root:
 pip install .
 ```
 
+Now you can open a terminal and run:
+```bash
+numeracrypt --help
+```
+
 ### Basic Usage
 
 ```python
