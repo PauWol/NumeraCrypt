@@ -9,14 +9,19 @@ This project is in an experimental and early development stage. It is not audite
 
 ## ✨ Features
 
-- 🔢 Multi-round byte-level encryption
-- 🔑 Custom key transformation logic
-- 📂 Support for encrypting/decrypting:
+- [x] 🔢 Multi-round byte-level encryption
+- [x] 🔑 Custom key transformation logic
+- [x] 📂 Support for encrypting/decrypting:
   - Plaintext strings
   - Files
   - Entire directories of files
-- 📦 Output encoded in Base91 for compact representation
-- 🔄 Decryption reverses the entire pipeline
+- [x] 📦 Output encoded in Base91 for compact representation
+- [x] 🔄 Decryption reverses the entire pipeline
+- [ ] 📍 Store Keys and Content
+  - In set location
+  - In current working directory
+- [ ] 📤 Load Keys and Contents from file
+- [ ] 🔗 Key sharing system
 
 ---
 
