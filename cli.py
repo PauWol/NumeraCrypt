@@ -2,6 +2,11 @@ import typer
 from core.cipher import NumeraCrypt
 from core.key import Key
 from pathlib import Path
+from dotenv import load_dotenv
+import os
+load_dotenv()
+
+
 
 app = typer.Typer(help="NumeraCrypt: A custom encryption tool.")
 
@@ -86,6 +91,43 @@ def decrypt(
         decrypted_path.write_text(nc.ascii_inst.string)
         typer.echo(f"📄 Decrypted content saved to {decrypted_path}")
 
+@app.command()
+def key(
+    key: str = typer.Option(None, help="Key to validate."),
+    salt: str = typer.Option(None, help="Salt to generate a key from."),
+    rounds: int = typer.Option(8, help="Number of rounds to use for later encryption."),
+    length: int = typer.Option(64, help="Length of the key."),
+    key_safe: bool = typer.Option(False, help="Flag to save the generated key to a file.")
+):
+    """Generate a key or validate an existing one."""
+
+    if rounds:
+        if rounds < 5:
+            typer.echo("❗ Number of rounds must be at least 5.")
+            raise typer.Exit(1)
+
+    if length:
+        if length < 64:
+            typer.echo("❗ Key length must be at least 64.")
+            raise typer.Exit(1)
+
+    if key:
+        if not Key(key).validate():
+            typer.echo("❗ Invalid key format.")
+            raise typer.Exit(1)
+        typer.echo("✅  Key is valid.")
+    elif salt:
+        key_generator = Key(salt, rounds, length)
+        key = key_generator.generate()
+        typer.echo(f"🔑 Generated key: {key}")
+    else:
+        typer.echo("❗ Please provide either a key or a salt to generate a key.")
+        raise typer.Exit(1)
+
+    if key_safe:
+        key_path = Path("key.key")
+        key_path.write_text(key)
+        typer.echo(f"📄  Key saved to {key_path}")
 
 if __name__ == "__main__":
     app()

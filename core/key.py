@@ -1,7 +1,10 @@
+from core.convert import ASCII
+from core.file import File
+from dotenv import load_dotenv
 import random
 import re
-from core.convert import ASCII  # Ensure your ASCII class supports encode_base91()/decode_base91()
-
+import os
+load_dotenv()
 
 class Key:
     def __init__(self, key: str = "", rounds: int = 5, max_length: int = 64):
@@ -61,7 +64,7 @@ class Key:
 
     def generate(self) -> str:
         """
-        Generates and stores a key.
+        Generates and a key.
         """
         num = self._random_num()
         self.value = self._assemble_key(num)
@@ -83,6 +86,7 @@ class Key:
         return decoded, int(prefix)
 
     def validate(self):
+        """Checks if the key is valid."""
         if not self.value:
             return False
         _prefix = self.extract_number_and_slash(self.value)
@@ -93,6 +97,20 @@ class Key:
             return False
         return True
 
+    def safe(self,path:str = None):
+        """Safes the key to a file either using the provided path or the KEY_PATH environment variable."""
+        if not self.value:
+            raise ValueError("No key value available to safe.")
+
+        if not self.validate():
+            raise ValueError("Invalid key format. Please use a valid key.")
+
+        env_path = os.getenv("KEY_STORAGE_DIRECTORY")
+        resolved_path = os.path.expandvars(path or env_path)
+        File(resolved_path).key_store(self.value)
+
+
+
 
 if __name__ == "__main__":
     # Generate a new key using an empty salt (or provide your custom salt here)
@@ -100,8 +118,4 @@ if __name__ == "__main__":
     assembled_key = key_generator.generate()
     print("Generated Key:", assembled_key)
 
-    # Now assume we want to disassemble the generated key.
-    # We pass the assembled key into a new Key object (which detects the '/' and uses it as a key)
-    key_from_string = Key(assembled_key)
-    decoded_value, prefix = key_from_string.disassemble()
-    print("Disassembled (decoded value, prefix):", decoded_value, prefix)
+    key_generator.safe()
