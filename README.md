@@ -40,6 +40,14 @@ git clone https://github.com/pauwol/NumeraCrypt.git
 cd NumeraCrypt
 ```
 
+### Install CLI
+
+Run this inside the project folder root:
+
+```bash
+pip install .
+```
+
 ### Basic Usage
 
 ```python
