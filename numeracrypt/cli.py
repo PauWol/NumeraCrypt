@@ -4,12 +4,20 @@ from numeracrypt.core.key import Key
 from pathlib import Path
 from dotenv import load_dotenv
 import os
-
-load_dotenv()
+# Get the directory where this file resides.
+base_dir = os.path.dirname(os.path.abspath(__file__))
+dotenv_path = os.path.join(base_dir, '.env')
+load_dotenv(dotenv_path)
 
 def key_store_location() -> str:
-    env_path = os.getenv("KEY_STORAGE_DIRECTORY", "key_storage")
+    env_path = os.getenv("KEY_STORAGE_DIRECTORY")
+    if not env_path:
+        # Warn the user and use the current working directory as a fallback.
+        import typer
+        typer.echo("❗ Warning: KEY_STORAGE_DIRECTORY is not set. Using the current working directory.")
+        return os.getcwd()
     return os.path.expandvars(env_path)
+
 
 app = typer.Typer(help="NumeraCrypt: A custom encryption tool.")
 

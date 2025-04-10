@@ -2,7 +2,20 @@ from pathlib import Path
 from datetime import datetime
 from dotenv import load_dotenv
 import os
-load_dotenv()
+# Get the directory where this file resides.
+base_dir = os.path.dirname(os.path.abspath(__file__))
+dotenv_path = os.path.join(base_dir, '.env')
+load_dotenv(dotenv_path)
+
+def key_file_extension() -> str:
+    env_path = os.getenv("KEY_FILE_EXTENSION")
+    if not env_path:
+        # Warn the user and use the current working directory as a fallback.
+        import typer
+        typer.echo("❗ Warning: KEY_FILE_EXTENSION is not set. Using the current default.")
+        return ".nkey"
+    return env_path
+
 
 class File:
     def __init__(self, file_path: str):
@@ -42,4 +55,4 @@ class File:
 
 
         current_time = datetime.now().strftime("%Y%m%d%H%M%S")
-        Path(self.path.resolve()).joinpath(f"key_{current_time}.{os.getenv('KEY_FILE_EXTENSION')}").write_text(key, encoding="utf-8")
+        Path(self.path.resolve()).joinpath(f"key_{current_time}.{key_file_extension()}").write_text(key, encoding="utf-8")

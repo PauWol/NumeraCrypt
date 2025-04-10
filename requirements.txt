@@ -1,0 +1,5 @@
+setuptools~=65.5.0
+python-dotenv~=1.0.1
+pathlib~=1.0.1
+base91~=1.0.1
+typer~=0.15.2
